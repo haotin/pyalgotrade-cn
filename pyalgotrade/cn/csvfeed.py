@@ -23,7 +23,7 @@ class Feed(membf.BarFeed):
         
     def barsHaveAdjClose(self):
         return False
-        
+
     def setDateTimeFormat(self, iformat):
         self._datetime_format = iformat
 

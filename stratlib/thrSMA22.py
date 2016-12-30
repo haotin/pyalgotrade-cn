@@ -5,45 +5,38 @@ Created on Tue Nov 03 13:06:56 2015
 @author: Eunice
 """
 
-# if __name__ == '__main__':
-#     import sys
-#     sys.path.append("..")
-#     from pyalgotrade import bar
-#     from pyalgotrade import plotter
+if __name__ == '__main__':
+    import sys
+    sys.path.append("..")     
+    from pyalgotrade import bar
+    from pyalgotrade import plotter
 # 以上模块仅测试用
 from pyalgotrade.broker.fillstrategy import DefaultStrategy
 from pyalgotrade.broker.backtesting import TradePercentage
 from pyalgotrade import strategy
 from pyalgotrade.technical import ma
 from pyalgotrade.technical import cross
-from pyalgotrade.technical import atr
 
-
-class thrSMA(strategy.BacktestingStrategy):
-    def __init__(self, feed, instrument, short_l, long_l, up_cum):
+class doublema(strategy.BacktestingStrategy):
+    def __init__(self, feed, instrument,m, n):
         strategy.BacktestingStrategy.__init__(self, feed)
         self.__instrument = instrument
         self.getBroker().setFillStrategy(DefaultStrategy(None))
         self.getBroker().setCommission(TradePercentage(0.001))
         self.__position = None
         self.__prices = feed[instrument].getPriceDataSeries()
-        self.__malength1 = int(short_l)
-        self.__malength2 = int(long_l)
-        self.__circ = int(up_cum)
-        self.__bardata = feed[instrument]
-        self.N = atr.ATR(self.__bardata, 20)
+        self.__malength1 = int(m)
+        self.__malength2 = int(n)
 
+        
         self.__ma1 = ma.SMA(self.__prices, self.__malength1)
         self.__ma2 = ma.SMA(self.__prices, self.__malength2)
-
+        
     def getPrice(self):
         return self.__prices
 
-    def getBarData(self):
-        return self.__bardata
-
     def getSMA(self):
-        return self.__ma1, self.__ma3
+        return self.__ma1,self.__ma2,
 
     def onEnterCanceled(self, position):
         self.__position = None
@@ -58,48 +51,40 @@ class thrSMA(strategy.BacktestingStrategy):
     def onExitCanceled(self, position):
         self.__position.exitMarket()
         
-    def buyCon1(self):
-        if cross.cross_above(self.__ma1, self.__ma3) > 0:
-            return True
-    
-    def sellCon1(self):
-        if cross.cross_below(self.__ma1, self.__ma3) > 0:
-            return True
-            
 
     def onBars(self, bars):
-        print self.N[-1],self.__ma1[-1]
         # If a position was not opened, check if we should enter a long position.
+        
         if self.__ma2[-1]is None:
-            return
-
+            return 
+            
         if self.__position is not None:
             if not self.__position.exitActive() and cross.cross_below(self.__ma1, self.__ma2) > 0:
                 self.__position.exitMarket()
-            #self.info("sell %s" % (bars.getDateTime()))
-
+                #self.info("sell %s" % (bars.getDateTime()))
+        
         if self.__position is None:
             if cross.cross_above(self.__ma1, self.__ma2) > 0:
                 shares = int(self.getBroker().getCash() * 0.2 / bars[self.__instrument].getPrice())
                 self.__position = self.enterLong(self.__instrument, shares)
                 print bars[self.__instrument].getDateTime(), bars[self.__instrument].getPrice()
-
-
-
+                #self.info("buy %s" % (bars.getDateTime()))
+    
+    
 def testStrategy():
     from pyalgotrade import bar
     from pyalgotrade import plotter
-
-    strat = thrSMA    
+    
+    strat = doublema
     instrument = '600288'
     market = 'SH'
     fromDate = '20150101'
     toDate ='20150601'
     frequency = bar.Frequency.MINUTE
-    paras = [3, 21,20]
+    paras = [2, 20]
     plot = True
     
-    #############################################path set ############################
+    #############################################path set ############################33 
     import os
     if frequency == bar.Frequency.MINUTE:
         path = os.path.join('..', 'histdata', 'minute')
@@ -108,7 +93,7 @@ def testStrategy():
     filepath = os.path.join(path, instrument + market + ".csv")
     
     
-    #############################################don't change #########################
+    #############################################don't change ############################33  
     from pyalgotrade.cn.csvfeed import Feed
     
     barfeed = Feed(frequency)
@@ -131,7 +116,6 @@ def testStrategy():
     strat.attachAnalyzer(drawDownAnalyzer)
     tradesAnalyzer = trades.Trades()
     strat.attachAnalyzer(tradesAnalyzer)
-
     
     if plot:
         plt = plotter.StrategyPlotter(strat, True, True, True)
@@ -153,9 +137,40 @@ def testStrategy():
     return_list = []
     for item in retAnalyzer.getCumulativeReturns():
         return_list.append(item)
-
-
-
-    print sharp,maxdd,return_
+        
+    
+    
 if __name__ == "__main__": 
     testStrategy()
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

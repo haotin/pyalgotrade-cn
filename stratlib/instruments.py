@@ -8,8 +8,8 @@ from pyalgotrade.stratanalyzer import sharpe
 import numpy as np
 import statsmodels.api as sm
 
-
-def get_beta(values1, values2):
+e
+def get_beta(values1, valus2):
     # http://statsmodels.sourceforge.net/stable/regression.html
     model = sm.OLS(values1, values2)
     results = model.fit()

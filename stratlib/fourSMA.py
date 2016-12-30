@@ -131,9 +131,9 @@ def testStrategy():
     strat = fourSMA    
     instrument = '600288'
     market = 'SH'
-    fromDate = '20150101'
+    fromDate = '20100104'
     toDate ='20150601'
-    frequency = bar.Frequency.MINUTE
+    frequency = bar.Frequency.DAY
     paras = [2, 20, 60, 10]
     plot = True
     
@@ -150,7 +150,7 @@ def testStrategy():
     from pyalgotrade.cn.csvfeed import Feed
     
     barfeed = Feed(frequency)
-    barfeed.setDateTimeFormat('%Y-%m-%d %H:%M:%S')
+    barfeed.setDateTimeFormat('%Y-%m-%d')
     barfeed.loadBars(instrument, market, fromDate, toDate, filepath)
     
     pyalgotrade_id = instrument + '.' + market
@@ -169,7 +169,7 @@ def testStrategy():
     strat.attachAnalyzer(drawDownAnalyzer)
     tradesAnalyzer = trades.Trades()
     strat.attachAnalyzer(tradesAnalyzer)
-    
+
     if plot:
         plt = plotter.StrategyPlotter(strat, True, True, True)
         
@@ -192,11 +192,7 @@ def testStrategy():
         return_list.append(item)
         
         
-
+    print  sharp,maxdd
+    return_list = []
 if __name__ == "__main__": 
     testStrategy()
-        
-        
-        
-        
-    
